@@ -1,0 +1,33 @@
+[
+  {
+    "name": "get_oa_news",
+    "description": "获取指定日期(cutoff_date)之后的OA通知列表。返回包含标题、日期及条目ID的数据。",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "cutoff_date": {
+          "type": "string",
+          "description": "截止日期 (YYYY-MM-DD)。"
+        }
+      },
+      "required": ["cutoff_date"]
+    }
+  },
+  {
+    "name": "stu_oa_scraper",
+    "description": "根据ID列表获取OA通知的正文详情。参数为整数数组 [id1, id2]。",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "需要读取的ID数组。"
+        }
+      },
+      "required": ["item_ids"]
+    }
+  }
+]
