@@ -4,22 +4,28 @@ import urllib.error
 import re
 import html
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
-def fetch_oa_news_until(target_date_str: str) -> str:
+def fetch_oa_news_until(days_ago: int) -> str:
     """
     Agent 调用的入口函数。
-    输入: target_date_str (如 "2023-10-01")
+    输入: days_ago (如 1 代表今天，7 代表这周)
     输出: 包含状态和数据的 JSON 字符串
     """
-    # 1. 尝试解析日期，如果失败，返回标准错误 JSON，指导 Agent 修正
+    # 1. 解析天数，转换为我们需要推算的截止日期 (target_date)
     try:
-        target_date = datetime.strptime(target_date_str, '%Y-%m-%d').date()
+        days = int(days_ago)
+        if days < 1:
+            days = 1
     except ValueError:
         return json.dumps({
             "status": "error",
-            "message": f"传入的日期格式错误: {target_date_str}。请使用 YYYY-MM-DD 格式重试。"
+            "message": f"传入的天数格式错误: {days_ago}。请传入一个整数（例如 1 或 7）。"
         }, ensure_ascii=False)
+
+    # 如果 days = 1，那就是只看今天（今天 - 0 天）
+    # 如果 days = 7，那就是看过去7天（今天 - 6 天）
+    target_date = datetime.today().date() - timedelta(days=days - 1)
 
     url = "http://oa.stu.edu.cn/csweb/list.jsp"
     host_domain = "http://oa.stu.edu.cn"
@@ -80,7 +86,7 @@ def fetch_oa_news_until(target_date_str: str) -> str:
                     date_str = "未知日期"
                     news_date = datetime.today().date()
                     
-                # 4. 判断截止日期
+                # 4. 判断获取到的通知日期是否已经早于我们推算出的目标日期
                 if news_date < target_date:
                     stop_crawling = True
                     break 
@@ -128,8 +134,8 @@ def fetch_oa_news_until(target_date_str: str) -> str:
 
 # 本地测试用的代码，如果是 Agent 引入此模块，下面的代码不会执行
 if __name__ == '__main__':
-    # 模拟 Agent 传参
-    test_date = "2026-4-12" 
-    result_json = fetch_oa_news_until(test_date)
+    # 模拟 Agent 传参: 查询本周（过去7天）的通知
+    test_days = 7 
+    result_json = fetch_oa_news_until(test_days)
     print("Agent 将会收到的结果：\n")
     print(result_json)

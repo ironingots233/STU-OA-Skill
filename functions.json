@@ -1,16 +1,16 @@
 [
   {
     "name": "get_oa_news",
-    "description": "获取指定日期(cutoff_date)之后的OA通知列表。返回包含标题、日期及条目ID的数据。",
+    "description": "获取指定天数内的OA通知列表。例如只查今天传入1，查这周传入7。",
     "parameters": {
       "type": "object",
       "properties": {
-        "cutoff_date": {
-          "type": "string",
-          "description": "截止日期 (YYYY-MM-DD)。"
+        "days_ago": {
+          "type": "integer",
+          "description": "要查询的过去天数。只查今天(当日)输入 1，查近一周输入 7，查近一月输入 30。"
         }
       },
-      "required": ["cutoff_date"]
+      "required": ["days_ago"]
     }
   },
   {
